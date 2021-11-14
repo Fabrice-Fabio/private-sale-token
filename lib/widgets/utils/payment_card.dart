@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:privatesale/widgets/utils/export_utils.dart';
 
 class PaymentCard extends StatefulWidget {
-  final title;
-  final assetPath;
-  const PaymentCard({Key? key, @required this.title, @required this.assetPath}) : super(key: key);
+  final String title;
+  final String assetPath;
+  final onTap;
+  const PaymentCard({Key? key, required this.title, required this.assetPath, this.onTap}) : super(key: key);
 
   @override
   _PaymentCardState createState() => _PaymentCardState();
 }
 
 class _PaymentCardState extends State<PaymentCard> {
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -30,7 +32,7 @@ class _PaymentCardState extends State<PaymentCard> {
                 title: widget.title,
                 btnColor: Colors.deepOrange,
                 textColor: Colors.white,
-                onTap: ()=>print("Join Telegram"),
+                //onTap: widget.onTap,
               ),
             ],
           ),

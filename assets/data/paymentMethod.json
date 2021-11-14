@@ -1,0 +1,42 @@
+[
+  {
+    "name": "BNB",
+    "logo": "assets/bnbLogo.png",
+    "valueRadio": 1
+  },
+  {
+    "name": "BTC",
+    "logo": "assets/btcLogo.png",
+    "valueRadio": 2
+  },
+  {
+    "name": "CAKE",
+    "logo": "assets/cakeLogo.png",
+    "valueRadio": 3
+  },
+  {
+    "name": "ETH",
+    "logo": "assets/ethLogo.png",
+    "valueRadio": 4
+  },
+  {
+    "name": "FEG",
+    "logo": "assets/fegLogo.png",
+    "valueRadio": 5
+  },
+  {
+    "name": "SAFEMOON",
+    "logo": "assets/safemoon.png",
+    "valueRadio": 6
+  },
+  {
+    "name": "USDC",
+    "logo": "assets/usdc.png",
+    "valueRadio": 7
+  },
+  {
+    "name": "USDT",
+    "logo": "assets/usdt.png",
+    "valueRadio": 8
+  }
+]

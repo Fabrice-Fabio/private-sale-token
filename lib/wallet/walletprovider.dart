@@ -6,8 +6,7 @@ class WalletProvider with ChangeNotifier {
   static const mainChain = 56;
   static const testnetChain = 97;
 
-  final web3provider = Web3Provider(ethereum!);
-
+  //final web3provider = Web3Provider(ethereum!);
   static const operatingChain = mainChain;
 
   String currentAddress = "";
@@ -30,7 +29,6 @@ class WalletProvider with ChangeNotifier {
     network: 'binance',
   );
 
-
   Web3Provider? web3wc;
 
   Future<void> connectProvider() async {
@@ -42,7 +40,7 @@ class WalletProvider with ChangeNotifier {
         if(accs.isNotEmpty) currentAddress = accs.first;
         currentChain = await ethereum!.getChainId();
 
-       if(isConnected) {
+        if(isConnected) {
           /// 1BNB = 1000000000000000000000
           getUserBalance = await provider!.getBalance(currentAddress); // it will display bigInt xn0
           print("getNetwork : ${provider!.getNetwork()}");
@@ -60,6 +58,7 @@ class WalletProvider with ChangeNotifier {
   }
 
   Future<void> connectW3() async {
+    print("ConnectW3");
 
     print("Try wallet connection connectW3");
     await wc.connect();
@@ -69,6 +68,7 @@ class WalletProvider with ChangeNotifier {
       wcConnected = true;
       web3wc = Web3Provider.fromWalletConnect(wc);
     }
+    final web3provider = Web3Provider.fromWalletConnect(wc);
 
     if(isConnected){
       /// 1BNB = 1000000000000000000000
@@ -92,9 +92,11 @@ class WalletProvider with ChangeNotifier {
     if(isEnabled){
       ethereum!.onAccountsChanged((accounts) {
         print("onAccountsChanged : "+accounts.toString());
+        connectProvider();
         clear();
       });
       ethereum!.onChainChanged((chainId) {
+        connectProvider();
         clear(); // foo
       });
     }
