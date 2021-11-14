@@ -21,6 +21,28 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
   int currentValSelected = 0;
   TextEditingController amountController = TextEditingController();
 
+  BigInt currentTokenBalance = BigInt.zero;
+
+  getCurrentCryptoInfo() async {
+    BigInt balance = BigInt.zero;
+    currentTokenBalance = balance; /// Initialize to BigInt.zero at each call
+    if(cryptochoose == "FEG"){
+      balance = await FegContract().getTokenBalance();
+      setState(() {
+        currentTokenBalance = balance;
+      });
+      print("balance : $balance");
+      print("FEG-balance : $currentTokenBalance");
+    }
+    if(cryptochoose == "SAFEMOON"){
+      balance = await SafemoonContract().getTokenBalance();
+      setState(() {
+        currentTokenBalance = balance;
+      });
+      print("SAFEM-balance : $currentTokenBalance");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -79,6 +101,7 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
                                                     val = x as int?;
                                                     cryptochoose = title.toString();
                                                   });
+                                                  getCurrentCryptoInfo();
                                                   print('val : $val');
                                                 },
                                               ),
@@ -107,7 +130,9 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
                             Text("Your $cryptochoose balance : \n", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20 ),),
                             Consumer<WalletProvider>(
                               builder: (context, provider, child) {
-                                return Text("${provider.getUserBalance}",style: TextStyle(fontWeight: FontWeight.w600,fontSize: 35 ));
+                                return cryptochoose == "BNB" ?
+                                Text("${provider.getUserBalance}",style: TextStyle(fontWeight: FontWeight.w600,fontSize: 35 )) :
+                                Text("$currentTokenBalance",style: TextStyle(fontWeight: FontWeight.w600,fontSize: 35 ));
                               },
                             ),
                             SizedBox(height: 6,),
