@@ -34,7 +34,7 @@ class _ConnectWalletState extends State<ConnectWallet> {
                     trailing: Image.asset("assets/metamask.png"),
                     onTap: (){
                       print("Metamask");
-                      currentContext.read<WalletProvider>().connectProvider();
+                      WalletProvider().connectProvider();
                       Navigator.pop(context);
                     },
                   ),

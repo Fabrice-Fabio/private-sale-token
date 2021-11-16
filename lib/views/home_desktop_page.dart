@@ -1,6 +1,13 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:privatesale/api/api.dart';
+import 'package:privatesale/smart_contracts/btc_contract.dart';
+import 'package:privatesale/smart_contracts/eth_contract.dart';
 import 'package:privatesale/smart_contracts/smart_contracts_index.dart';
+import 'package:privatesale/smart_contracts/usdc_contract.dart';
+import 'package:privatesale/smart_contracts/usdt_contract.dart';
 import 'package:privatesale/wallet/walletprovider.dart';
 import 'package:privatesale/widgets/centered_view/centered_view.dart';
 import 'package:privatesale/widgets/navigation_bar/navigation_bar.dart';
@@ -22,24 +29,127 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
   TextEditingController amountController = TextEditingController();
 
   BigInt currentTokenBalance = BigInt.zero;
+  int currentDecimal = 0;
+  int currentAllowance = 0;
+
+  getBalanceWithoutDecimal(BigInt tokenBalance,int decimal){
+    print("---tokenBalance : $tokenBalance && decimal : $decimal ---");
+    /*double res = tokenBalance.toDouble();
+    print("double token : $res");*/
+    int tokenBalanceToInt = tokenBalance.toInt();
+    print("int token : $tokenBalanceToInt");
+
+    var res = tokenBalanceToInt/pow(10, decimal);
+
+    print("res final : $res");
+    return res;
+  }
+
+  alreadyApprove(){
+    print("alreadyApprove-currentAllowance : $currentAllowance");
+    print("alreadyApprove-balance : ${getBalanceWithoutDecimal(currentTokenBalance,currentDecimal)}");
+    //
+    if(currentAllowance<=0 || currentAllowance < getBalanceWithoutDecimal(currentTokenBalance,currentDecimal)){
+      return false;
+    }else{
+      return true;
+    }
+  }
+  
+  approveFunc() async {
+    print("approve check allowance : $currentAllowance");
+    if(cryptochoose == "BTC"){
+      BtcContract().approve(currentTokenBalance)
+          .then((res) => {
+            // TODO : afficher un loader le temps que la res passe à true
+            print("Approve res : $res"),
+      });
+    }
+  }
+
+  buy(){}
 
   getCurrentCryptoInfo() async {
+    /// currentTokenBalance is BigInt (token balance with exp value)
     BigInt balance = BigInt.zero;
     currentTokenBalance = balance; /// Initialize to BigInt.zero at each call
-    if(cryptochoose == "FEG"){
-      balance = await FegContract().getTokenBalance();
+    if(cryptochoose == "BTC"){
+      balance = await BtcContract().getTokenBalance();
+      var _currentDecimal = await BtcContract().getDecimal();
+      var _currentAllowance = await BtcContract().allowance();
       setState(() {
         currentTokenBalance = balance;
+        currentDecimal = _currentDecimal;
+        currentAllowance = _currentAllowance.toInt();
+      });
+      print("BTC-balance : $currentTokenBalance");
+    }
+    if(cryptochoose == "CAKE"){
+      balance = await CakeContract().getTokenBalance();
+      var _currentDecimal = await CakeContract().getDecimal();
+      var _currentAllowance = await CakeContract().allowance();
+      setState(() {
+        currentTokenBalance = balance;
+        currentDecimal = _currentDecimal;
+        currentAllowance = _currentAllowance.toInt();
+      });
+      print("CAKE-balance : $currentTokenBalance");
+    }
+    if(cryptochoose == "ETH"){
+      balance = await EthContract().getTokenBalance();
+      var _currentDecimal = await EthContract().getDecimal();
+      var _currentAllowance = await EthContract().allowance();
+      setState(() {
+        currentTokenBalance = balance;
+        currentDecimal = _currentDecimal;
+        currentAllowance = _currentAllowance.toInt();
+      });
+      print("ETH-balance : $currentTokenBalance");
+    }
+    if(cryptochoose == "FEG"){
+      balance = await FegContract().getTokenBalance();
+      var _currentDecimal = await FegContract().getDecimal();
+      var _currentAllowance = await FegContract().allowance();
+      setState(() {
+        currentTokenBalance = balance;
+        currentDecimal = _currentDecimal;
+        currentAllowance = _currentAllowance.toInt();
       });
       print("balance : $balance");
       print("FEG-balance : $currentTokenBalance");
     }
     if(cryptochoose == "SAFEMOON"){
       balance = await SafemoonContract().getTokenBalance();
+      var _currentDecimal = await SafemoonContract().getDecimal();
+      var _currentAllowance = await SafemoonContract().allowance();
       setState(() {
         currentTokenBalance = balance;
+        currentDecimal = _currentDecimal;
+        currentAllowance = _currentAllowance.toInt();
       });
       print("SAFEM-balance : $currentTokenBalance");
+    }
+    if(cryptochoose == "USDC"){
+      balance = await USDCContract().getTokenBalance();
+      var _currentDecimal = await USDCContract().getDecimal();
+      var _currentAllowance = await USDCContract().allowance();
+      setState(() {
+        currentTokenBalance = balance;
+        currentDecimal = _currentDecimal;
+        currentAllowance = _currentAllowance.toInt();
+      });
+      print("USDC-balance : $currentTokenBalance");
+    }
+    if(cryptochoose == "USDT"){
+      balance = await USDTContract().getTokenBalance();
+      var _currentDecimal = await USDTContract().getDecimal();
+      var _currentAllowance = await USDTContract().allowance();
+      setState(() {
+        currentTokenBalance = balance;
+        currentDecimal = _currentDecimal;
+        currentAllowance = _currentAllowance.toInt();
+      });
+      print("USDT-balance : $currentTokenBalance");
     }
   }
 
@@ -131,8 +241,8 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
                             Consumer<WalletProvider>(
                               builder: (context, provider, child) {
                                 return cryptochoose == "BNB" ?
-                                Text("${provider.getUserBalance}",style: TextStyle(fontWeight: FontWeight.w600,fontSize: 35 )) :
-                                Text("$currentTokenBalance",style: TextStyle(fontWeight: FontWeight.w600,fontSize: 35 ));
+                                Text("${getBalanceWithoutDecimal(provider.getUserBalance,18)}",style: TextStyle(fontWeight: FontWeight.w600,fontSize: 35 )) :
+                                Text("${getBalanceWithoutDecimal(currentTokenBalance,currentDecimal)}",style: TextStyle(fontWeight: FontWeight.w600,fontSize: 35 ));
                               },
                             ),
                             SizedBox(height: 6,),
@@ -246,22 +356,27 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  TextBtn(
+                  if(!alreadyApprove()) TextBtn(
                     height: 35,
                     width: 100,
                     title: "Approve",
                     btnColor: Colors.orangeAccent,
                     textColor: Colors.white,
-                    onTap: ()=> {
-                    },
+                    onTap: ()=> approveFunc(),
                   ),
                   TextBtn(
                     height: 35,
                     width: 100,
-                    title: "Valider",
-                    btnColor: Colors.deepOrange,
+                    title: "Buy",
+                    btnColor: alreadyApprove() ? Colors.deepOrange : Colors.grey,
                     textColor: Colors.white,
                     onTap: ()=> {
+                      if(alreadyApprove()){
+                        // TODO : run func buy
+                        buy()
+                      }else{
+                        print("No authorized to buy... Approve first"),
+                      }
                     },
                   ),
                 ],
@@ -274,7 +389,8 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
                     InkWell(
                       child: Text("© WainCorp - 2021"),
                       onTap: (){
-                        SartContract().getTokenInfo();
+                        BtcContract().allowance();
+                        //Api().getCurrentTokenPrice("0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c");
                       },
                     ),
                   ],

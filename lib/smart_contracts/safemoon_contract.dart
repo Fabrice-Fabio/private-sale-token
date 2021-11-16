@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_web3/flutter_web3.dart';
+import 'package:privatesale/abis/testnetabis.dart';
 import '../abis/abis.dart';
 
 
 
 class SafemoonContract extends ChangeNotifier {
-  static final abi = Abis();
+  //static final abi = Abis();
+  static final abi = TestnetAbis();
   static final signer = provider!.getSigner();
   final safemoonCtr = Contract(
     abi.safemoonAddress,
     Interface(abi.safemoonAbi),
     signer,
   );
+
+  Future<int> getDecimal() async {
+    return abi.safemoonDecimal;
+  }
 
   Future<String> getTokenName() async {
     String usrAdr = await signer.getAddress();
@@ -56,19 +62,21 @@ class SafemoonContract extends ChangeNotifier {
     return res;
   }
 
-  Future<void> allowance(amount,spender) async {
+  Future<BigInt> allowance() async {
+    print("--- Ask Allowance ---");
     String usrAdr = await signer.getAddress();
     // 1 sart -> 1000 wei
     // [owner,spender]
-    final res = await safemoonCtr.call<BigInt>('allowance', [usrAdr, spender]);
+    final res = await safemoonCtr.call<BigInt>('allowance', [usrAdr, abi.presaleSmartContract]);
 
-    print("res : $res");
+    print("allowance Res : $res");
+    return res;
   }
 
 
   Future<bool> approve(amount) async {
     // 1 sart -> 1000 wei
-    final tx = await safemoonCtr.send('approve', [safemoonCtr.address, amount]);
+    final tx = await safemoonCtr.send('approve', [abi.presaleSmartContract, amount]);
     tx.hash; // 0xbar
 
     final receipt = tx.wait(); // Wait until transaction complete

@@ -5,18 +5,18 @@ import '../abis/abis.dart';
 
 
 
-class CakeContract extends ChangeNotifier {
+class USDCContract extends ChangeNotifier {
   //static final abi = Abis();
   static final abi = TestnetAbis();
   static final signer = provider!.getSigner();
-  final cakeCtr = Contract(
-    abi.cakeAddress,
-    Interface(abi.cakeAbi),
+  final usdcCtr = Contract(
+    abi.usdcAddress,
+    Interface(abi.usdtAbi), /// WARNING- TODO : DON'T CHANGE TO USDCABI CAUSE IT ABI DID NOT WORK WITH BALANCEOF SO USE USDT BCZ IT ALSO ERC20
     signer,
   );
 
   Future<int> getDecimal() async {
-    return abi.cakeDecimal;
+    return abi.usdcDecimal;
   }
 
   Future<String> getTokenName() async {
@@ -24,7 +24,7 @@ class CakeContract extends ChangeNotifier {
     var tokenName = "";
     try{
       // Get account balance
-      tokenName = await cakeCtr.call<String>('name');
+      tokenName = await usdcCtr.call<String>('name');
       print("name : $tokenName");
       return tokenName;
     }catch(e){
@@ -38,7 +38,7 @@ class CakeContract extends ChangeNotifier {
     BigInt tokenAmount = BigInt.zero;
     try{
       // Get account balance
-      tokenAmount = await cakeCtr.call<BigInt>(
+      tokenAmount = await usdcCtr.call<BigInt>(
         'balanceOf',
         [usrAdr], // getUserCurrentAddress
       );
@@ -52,7 +52,7 @@ class CakeContract extends ChangeNotifier {
 
   Future<bool> transfer(receivedAdr,amount) async {
     // 1 sart -> 1000 wei
-    final tx = await cakeCtr.send('transfer', [receivedAdr, amount]);
+    final tx = await usdcCtr.send('transfer', [receivedAdr, amount]);
     tx.hash; // 0xbar
 
     final receipt = tx.wait(); // Wait until transaction complete
@@ -67,15 +67,16 @@ class CakeContract extends ChangeNotifier {
     String usrAdr = await signer.getAddress();
     // 1 sart -> 1000 wei
     // [owner,spender]
-    final res = await cakeCtr.call<BigInt>('allowance', [usrAdr, abi.presaleSmartContract]);
+    final res = await usdcCtr.call<BigInt>('allowance', [usrAdr, abi.presaleSmartContract]);
 
     print("allowance Res : $res");
     return res;
   }
 
+
   Future<bool> approve(amount) async {
     // 1 sart -> 1000 wei
-    final tx = await cakeCtr.send('approve', [abi.presaleSmartContract, amount]);
+    final tx = await usdcCtr.send('approve', [abi.presaleSmartContract, amount]);
     tx.hash; // 0xbar
 
     final receipt = tx.wait(); // Wait until transaction complete

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_web3/flutter_web3.dart';
+import 'package:privatesale/abis/testnetabis.dart';
 import '../abis/abis.dart';
 
 
 
 class SartContract extends ChangeNotifier {
-  static final abi = Abis();
+  //static final abi = Abis();
+  static final abi = TestnetAbis();
   static final signer = provider!.getSigner();
   final sartCtr = Contract(
     abi.sartAddress,

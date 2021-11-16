@@ -7,7 +7,7 @@ class WalletProvider with ChangeNotifier {
   static const testnetChain = 97;
 
   //final web3provider = Web3Provider(ethereum!);
-  static const operatingChain = mainChain;
+  static const operatingChain = testnetChain;
 
   String currentAddress = "";
 
@@ -23,13 +23,18 @@ class WalletProvider with ChangeNotifier {
 
   bool wcConnected = false;
 
-  final wc = WalletConnectProvider.fromRpc(
+  /// Check if wc will be log with walletconnect or not
+  final wc = mainChain == 56 ?
+  WalletConnectProvider.fromRpc(
     {56: 'https://bsc-dataseed.binance.org/'},
     chainId: 56,
     network: 'binance',
+  ) :
+  WalletConnectProvider.fromRpc(
+    {97: 'https://data-seed-prebsc-1-s1.binance.org:8545/'},
+    chainId: 97,
+    network: 'binance',
   );
-
-  Web3Provider? web3wc;
 
   Future<void> connectProvider() async {
     if(isEnabled){
@@ -43,7 +48,7 @@ class WalletProvider with ChangeNotifier {
         if(isConnected) {
           /// 1BNB = 1000000000000000000000
           getUserBalance = await provider!.getBalance(currentAddress); // it will display bigInt xn0
-          print("getNetwork : ${provider!.getNetwork()}");
+          print("getNetwork : ${await provider!.getNetwork()}");
         }
 
         print("currentAddress : $currentAddress");
@@ -66,7 +71,6 @@ class WalletProvider with ChangeNotifier {
       currentAddress = wc.accounts.first;
       currentChain = wc.chainId as int;
       wcConnected = true;
-      web3wc = Web3Provider.fromWalletConnect(wc);
     }
     final web3provider = Web3Provider.fromWalletConnect(wc);
 
