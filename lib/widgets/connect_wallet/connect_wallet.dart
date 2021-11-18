@@ -1,14 +1,17 @@
 import 'dart:html';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_web3/flutter_web3.dart';
+import 'package:privatesale/wallet/metamaskprovider.dart';
 import 'package:privatesale/wallet/walletprovider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart';
 
 class ConnectWallet extends StatefulWidget {
+  /*
   final BuildContext parentContext;
   const ConnectWallet({Key? key, required this.parentContext}) : super(key: key);
+  */
+  const ConnectWallet({Key? key}) : super(key: key);
 
   @override
   State<ConnectWallet> createState() => _ConnectWalletState();
@@ -16,10 +19,10 @@ class ConnectWallet extends StatefulWidget {
 
 class _ConnectWalletState extends State<ConnectWallet> {
 
-  showAlertDialog(BuildContext context, BuildContext currentContext) {
+  showAlertDialog(BuildContext pcontext) {
     // show the dialog
     showDialog(
-      context: context,
+      context: pcontext,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Connect Wallet"),
@@ -34,7 +37,8 @@ class _ConnectWalletState extends State<ConnectWallet> {
                     trailing: Image.asset("assets/metamask.png"),
                     onTap: (){
                       print("Metamask");
-                      WalletProvider().connectProvider();
+                      //Provider.of<WalletProvider>(context, listen: false).connectProvider();
+                      pcontext.read<WalletProvider>().connectProvider();
                       Navigator.pop(context);
                     },
                   ),
@@ -44,7 +48,7 @@ class _ConnectWalletState extends State<ConnectWallet> {
                     trailing: Image.asset("assets/walletcon.png"),
                     onTap: (){
                       print("Wallet Connect");
-                      currentContext.read<WalletProvider>().connectW3();
+                      pcontext.read<WalletProvider>().connectW3();
                       Navigator.pop(context);
                     },
                   )
@@ -67,44 +71,42 @@ class _ConnectWalletState extends State<ConnectWallet> {
 
   @override
   Widget build(BuildContext context) {
-    String titleConnect="Connect to Wallet";
-    return ChangeNotifierProvider(
-      create: (context)=> WalletProvider()..init(),
-      builder: (context, snapshot) {
-        return Consumer<WalletProvider>(
-            builder: (contextCosum, provider, child) {
-              /// TODO : mettre ceci à la place de l'endroit ou j'affiche l'adr de l'user pour afficher des messages d'erreurs en cas d'erreur
-              if(provider.isConnected && provider.isInOperatingChain) {
-                print("--Connection success--");
-                if(provider.currentAddress != "") {
-                  titleConnect = provider.currentAddress;
-                }
-              }else if(!provider.isConnected && !provider.isInOperatingChain){
-                  print("Wrong chain. PLease connect to ${WalletProvider.operatingChain}");
-              }else if(provider.isEnabled){
-                print("Enable to use metamask");
-              } else {
-                print("Please use a web3 supported browser");
-              }
+    String _currentAddress = Provider.of<WalletProvider>(context, listen: true).currentAddress;
+    //String titleConnect= _currentAddress != "" ? _currentAddress : "Connect to Wallet";
+    String titleConnect= "Connect to Wallet";
 
-              return InkWell(
-                child: Container(
-                  width: 250,
-                  padding: EdgeInsets.symmetric(horizontal: 60,vertical: 15),
-                  child: Text(titleConnect,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.white),),
-                  decoration: BoxDecoration(
-                    color: Color.fromARGB(227, 229, 120, 37),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                ),
-                onTap: ()=>{
-                  //context.read<MetaMaskProvider>().connect(),
-                  showAlertDialog(widget.parentContext,contextCosum),
-                },
-              );
-            }
+    return Consumer<WalletProvider>(
+      builder: (context, provider, child) {
+        if(provider.isConnected && provider.isInOperatingChain) {
+          print("--Connection success--");
+          if(provider.currentAddress != "") {
+            print("fuck1111 : ${provider.currentAddress}");
+            titleConnect = provider.currentAddress;
+          }
+        }else if(!provider.isConnected && !provider.isInOperatingChain){
+          print("Wrong chain. PLease connect to ${WalletProvider.operatingChain}");
+        }else if(provider.isEnabled){
+          print("Enable to use metamask");
+        } else {
+          print("Please use a web3 supported browser");
+        }
+
+        return InkWell(
+          child: Container(
+            width: 250,
+            padding: EdgeInsets.symmetric(horizontal: 60,vertical: 15),
+            child: Text(titleConnect,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.white),),
+            decoration: BoxDecoration(
+              color: Color.fromARGB(227, 229, 120, 37),
+              borderRadius: BorderRadius.circular(5),
+            ),
+          ),
+          onTap: ()=>{
+            //context.read<MetaMaskProvider>().connect(),
+            showAlertDialog(context),
+          },
         );
       },
     );

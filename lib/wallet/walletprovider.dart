@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_web3/flutter_web3.dart';
 
@@ -12,6 +14,14 @@ class WalletProvider with ChangeNotifier {
   String currentAddress = "";
 
   BigInt getUserBalance = BigInt.zero;
+
+
+  /// Test with streambuilder
+
+  StreamController<BigInt> balanceController = StreamController<BigInt>(); // Declare stream var
+  Stream<BigInt> get getBalanceStream => balanceController.stream; // func return stream value
+
+  /// Streambuilder Test
 
   int currentChain = -1;
 
@@ -37,6 +47,7 @@ class WalletProvider with ChangeNotifier {
   );
 
   Future<void> connectProvider() async {
+
     if(isEnabled){
       print("✨----Metamask connection----✨");
       try {
@@ -50,6 +61,13 @@ class WalletProvider with ChangeNotifier {
           getUserBalance = await provider!.getBalance(currentAddress); // it will display bigInt xn0
           print("getNetwork : ${await provider!.getNetwork()}");
         }
+
+        /*balanceController.add(getUserBalance);
+
+        balanceController.stream.listen((event) {
+          print("balanceController : $event");
+        });*/
+
 
         print("currentAddress : $currentAddress");
         print("currentChain : $currentChain");

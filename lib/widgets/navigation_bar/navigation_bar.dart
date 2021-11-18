@@ -17,48 +17,45 @@ class _NavigationBarState extends State<NavigationBar> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context)=> WalletProvider()..init(),
-      builder: (contextProv, snapshot) {
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            if (constraints.maxWidth >= 992) {
-              return desktopNavBar(context);
-            } else {
-              return mobileNavBar(context);
-            }},);
-      },
-    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= 992) {
+          return desktopNavBar(context);
+        } else {
+          return mobileNavBar(context);
+        }},);
   }
 }
 
 Widget desktopNavBar(context){
-  return Consumer<WalletProvider>(
-    builder: (context, provider, child) {
-      return Container(
-        height: 100,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            InkWell(
-              child: Row(
-                children: [
-                  SizedBox(height: 80,width: 150, child: Image.asset("assets/logo.png"),),
-                  Text("PRIVATESALE",  style: TextStyle(fontSize: 18, color: Colors.red[500], fontWeight: FontWeight.w600),)
-                ],
-              ),
-              onTap: (){Navigator.pushNamed(context, '/');},
-            ),
-            Text(provider.currentAddress),
-            Row(
-              children: [
-                ethereum != null ? ConnectWallet(parentContext: context) : Text("Web 3 not supported"),
-              ],
-            )
-          ],
+  return Container(
+    height: 100,
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        InkWell(
+          child: Row(
+            children: [
+              SizedBox(height: 80,width: 150, child: Image.asset("assets/logo.png"),),
+              Text("PRIVATESALE",  style: TextStyle(fontSize: 18, color: Colors.red[500], fontWeight: FontWeight.w600),)
+            ],
+          ),
+          onTap: (){Navigator.pushNamed(context, '/');},
         ),
-      );
-    }
+        Consumer<WalletProvider>(
+            builder: (context, provider, child) {
+              print("fuck222: ${provider.currentAddress}");
+              return Text(provider.currentAddress);
+            }
+        ),
+        Row(
+          children: [
+            //ethereum != null ? ConnectWallet(parentContext: context) : Text("Web 3 not supported"),
+            ethereum != null ? ConnectWallet() : Text("Web 3 not supported"),
+          ],
+        )
+      ],
+    ),
   );
 }
 

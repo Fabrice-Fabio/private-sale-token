@@ -32,6 +32,7 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
   int currentDecimal = 0;
   int currentAllowance = 0;
 
+
   getBalanceWithoutDecimal(BigInt tokenBalance,int decimal){
     print("---tokenBalance : $tokenBalance && decimal : $decimal ---");
     /*double res = tokenBalance.toDouble();
@@ -49,7 +50,7 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
     print("alreadyApprove-currentAllowance : $currentAllowance");
     print("alreadyApprove-balance : ${getBalanceWithoutDecimal(currentTokenBalance,currentDecimal)}");
     //
-    if(currentAllowance<=0 || currentAllowance < getBalanceWithoutDecimal(currentTokenBalance,currentDecimal)){
+    if(currentAllowance<=0 || currentAllowance < currentTokenBalance.toInt()){
       return false;
     }else{
       return true;
@@ -156,6 +157,7 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    BigInt bnbBalance = Provider.of<WalletProvider>(context, listen: true).getUserBalance;
 
     return Scaffold(
       body: CenteredView(
@@ -238,10 +240,25 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
                           children: [
                             Text("1 BNB = 10000000000 NFTBD\n",style: TextStyle(fontWeight: FontWeight.w400,fontSize: 25 )),
                             Text("Your $cryptochoose balance : \n", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20 ),),
+                            /*StreamBuilder<BigInt>(
+                              stream: WalletProvider().getBalanceStream,
+                              builder: (context, snapshot) {
+                                print("snapshot : ${snapshot.data}");
+                                BigInt res = BigInt.zero;
+                                WalletProvider().getBalanceStream.listen((event) {
+                                  print("eveeeet : $event");
+                                  setState(() {
+                                    res = event;
+                                  });
+                                });
+                                return res == BigInt.zero ? const CircularProgressIndicator(color: Colors.orangeAccent,) :
+                                Text("Res = $res");
+                              },
+                            ),*/
                             Consumer<WalletProvider>(
                               builder: (context, provider, child) {
                                 return cryptochoose == "BNB" ?
-                                Text("${getBalanceWithoutDecimal(provider.getUserBalance,18)}",style: TextStyle(fontWeight: FontWeight.w600,fontSize: 35 )) :
+                                Text("${getBalanceWithoutDecimal(bnbBalance,18)}",style: TextStyle(fontWeight: FontWeight.w600,fontSize: 35 )) :
                                 Text("${getBalanceWithoutDecimal(currentTokenBalance,currentDecimal)}",style: TextStyle(fontWeight: FontWeight.w600,fontSize: 35 ));
                               },
                             ),
