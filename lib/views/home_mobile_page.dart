@@ -57,7 +57,7 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
                           crossAxisCount: 3, // numbers of rows
                           shrinkWrap: true, // enable page to accept scroll gridview inside column
                           children: List.generate(widget.paymentData.length, (int index) {
-                            print("title : ${widget.paymentData[index]['name'].toString()}");
+                            debugPrint("title : ${widget.paymentData[index]['name'].toString()}");
                             var title = widget.paymentData[index]['name'];
                             var logo = widget.paymentData[index]['logo'];
                             var radioVal = widget.paymentData[index]['valueRadio'];
@@ -80,7 +80,7 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
                                             setState(() {
                                               val = x as int?;
                                             });
-                                            print('val : $val');
+                                            debugPrint('val : $val');
                                           },
                                         ),
                                       ],

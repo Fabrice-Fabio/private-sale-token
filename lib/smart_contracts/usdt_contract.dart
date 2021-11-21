@@ -19,16 +19,20 @@ class USDTContract extends ChangeNotifier {
     return abi.usdtDecimal;
   }
 
+  Future<String> getMainAddress() async {
+    return abi.usdtSCAddress;
+  }
+
   Future<String> getTokenName() async {
     String usrAdr = await signer.getAddress();
     var tokenName = "";
     try{
       // Get account balance
       tokenName = await usdtCtr.call<String>('name');
-      print("name : $tokenName");
+      debugPrint("name : $tokenName");
       return tokenName;
     }catch(e){
-      print('err = $e');
+      debugPrint('err = $e');
       return tokenName;
     }
   }
@@ -42,10 +46,10 @@ class USDTContract extends ChangeNotifier {
         'balanceOf',
         [usrAdr], // getUserCurrentAddress
       );
-      print("tokenAmount : $tokenAmount");
+      debugPrint("tokenAmount : $tokenAmount");
       return tokenAmount;
     }catch(e){
-      print('err = $e');
+      debugPrint('err = $e');
       return tokenAmount;
     }
   }
@@ -58,18 +62,18 @@ class USDTContract extends ChangeNotifier {
     final receipt = tx.wait(); // Wait until transaction complete
 
     var res = await receipt is TransactionReceipt;
-    print("res : $res"); // if true => transaction success
+    debugPrint("res : $res"); // if true => transaction success
     return res;
   }
 
   Future<BigInt> allowance() async {
-    print("--- Ask Allowance ---");
+    debugPrint("--- Ask Allowance ---");
     String usrAdr = await signer.getAddress();
     // 1 sart -> 1000 wei
     // [owner,spender]
     final res = await usdtCtr.call<BigInt>('allowance', [usrAdr, abi.presaleSmartContract]);
 
-    print("allowance Res : $res");
+    debugPrint("allowance Res : $res");
     return res;
   }
 
@@ -81,7 +85,7 @@ class USDTContract extends ChangeNotifier {
     final receipt = tx.wait(); // Wait until transaction complete
 
     var res = await receipt is TransactionReceipt;
-    print("res : $res"); // if true => transaction success
+    debugPrint("res : $res"); // if true => transaction success
     return res;
   }
 

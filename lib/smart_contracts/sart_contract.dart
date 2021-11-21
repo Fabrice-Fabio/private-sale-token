@@ -25,10 +25,10 @@ class SartContract extends ChangeNotifier {
         [usrAdr], // getUserCurrentAddress
         //provider!.getSigner().getAddress().toString()
       );
-      print("name : $tokenName");
-      print("amount : ${tokenAmount.toString()}");
+      debugPrint("name : $tokenName");
+      debugPrint("amount : ${tokenAmount.toString()}");
     }catch(e){
-      print('err = $e');
+      debugPrint('err = $e');
     }
 
   }

@@ -1,6 +1,7 @@
 import 'dart:html';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:privatesale/wallet/metamaskprovider.dart';
 import 'package:privatesale/wallet/walletprovider.dart';
 import 'package:provider/provider.dart';
@@ -36,7 +37,7 @@ class _ConnectWalletState extends State<ConnectWallet> {
                     title: Text("Metamask",style: TextStyle(color: Colors.black),),
                     trailing: Image.asset("assets/metamask.png"),
                     onTap: (){
-                      print("Metamask");
+                      debugPrint("Metamask");
                       //Provider.of<WalletProvider>(context, listen: false).connectProvider();
                       pcontext.read<WalletProvider>().connectProvider();
                       Navigator.pop(context);
@@ -47,7 +48,7 @@ class _ConnectWalletState extends State<ConnectWallet> {
                     title: Text("Wallet Connect",style: TextStyle(color: Colors.black),),
                     trailing: Image.asset("assets/walletcon.png"),
                     onTap: (){
-                      print("Wallet Connect");
+                      debugPrint("Wallet Connect");
                       pcontext.read<WalletProvider>().connectW3();
                       Navigator.pop(context);
                     },
@@ -78,17 +79,20 @@ class _ConnectWalletState extends State<ConnectWallet> {
     return Consumer<WalletProvider>(
       builder: (context, provider, child) {
         if(provider.isConnected && provider.isInOperatingChain) {
-          print("--Connection success--");
           if(provider.currentAddress != "") {
-            print("fuck1111 : ${provider.currentAddress}");
+            debugPrint("fuck1111 : ${provider.currentAddress}");
             titleConnect = provider.currentAddress;
           }
         }else if(!provider.isConnected && !provider.isInOperatingChain){
-          print("Wrong chain. PLease connect to ${WalletProvider.operatingChain}");
+          debugPrint("Wrong chain. PLease connect to ${WalletProvider.operatingChain}");
+          Fluttertoast.showToast(
+            msg: "Wrong chain. PLease connect to BS",
+            timeInSecForIosWeb: 2,
+          );
         }else if(provider.isEnabled){
-          print("Enable to use metamask");
+          debugPrint("Enable to use metamask");
         } else {
-          print("Please use a web3 supported browser");
+          debugPrint("Please use a web3 supported browser");
         }
 
         return InkWell(

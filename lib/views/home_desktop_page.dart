@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:privatesale/api/api.dart';
 import 'package:privatesale/smart_contracts/btc_contract.dart';
 import 'package:privatesale/smart_contracts/eth_contract.dart';
@@ -23,54 +24,289 @@ class HomeDesktopPage extends StatefulWidget {
 }
 
 class _HomeDesktopPageState extends State<HomeDesktopPage> {
-  int? val = 1;
-  String cryptochoose = "BNB";
-  int currentValSelected = 0;
-  TextEditingController amountController = TextEditingController();
+  int? val = 1; // Radio value
+  String cryptochoose = "BNB"; // Token name after select radio
+  int currentValSelected = 0; // Price selected to invest between (1->0.1 || 2->0.5 || 3->1 || 4-> 3) bnb
+  TextEditingController amountController = TextEditingController(); // Price user edit by own to invest
+  double priceBnbByNFTB = 20000000; // 1BNB -> 20000000 NFTB
 
-  BigInt currentTokenBalance = BigInt.zero;
-  int currentDecimal = 0;
-  int currentAllowance = 0;
+  BigInt currentTokenBalance = BigInt.zero; // selected token balance in this wallet
+  int currentDecimal = 8; // selected token decimal (DEFAULT 8 = BNB DEC)
+  String currentSCAddress = ""; // selected token sc address
+  int currentAllowance = 0; // check if user are already approve current token payment and get value
+
+
+  getTokenPriceInBnb(currentAddress) async {
+    double res = await Api().getCurrentTokenPrice(currentAddress);
+    debugPrint("getTokenPriceInBnb : $res");
+    return res;
+  }
 
 
   getBalanceWithoutDecimal(BigInt tokenBalance,int decimal){
-    print("---tokenBalance : $tokenBalance && decimal : $decimal ---");
+    debugPrint("---tokenBalance : $tokenBalance && decimal : $decimal ---");
     /*double res = tokenBalance.toDouble();
     print("double token : $res");*/
     int tokenBalanceToInt = tokenBalance.toInt();
-    print("int token : $tokenBalanceToInt");
+    debugPrint("int token : $tokenBalanceToInt");
 
     var res = tokenBalanceToInt/pow(10, decimal);
 
-    print("res final : $res");
+    debugPrint("res final : $res");
     return res;
   }
 
   alreadyApprove(){
-    print("alreadyApprove-currentAllowance : $currentAllowance");
-    print("alreadyApprove-balance : ${getBalanceWithoutDecimal(currentTokenBalance,currentDecimal)}");
+    debugPrint("alreadyApprove-currentAllowance : $currentAllowance");
+    debugPrint("alreadyApprove-balance : ${getBalanceWithoutDecimal(currentTokenBalance,currentDecimal)}");
     //
-    if(currentAllowance<=0 || currentAllowance < currentTokenBalance.toInt()){
-      return false;
-    }else{
-      return true;
+    if(cryptochoose != "BNB"){
+      if(currentAllowance<=0 || currentAllowance < currentTokenBalance.toInt()){
+        return false;
+      }else{
+        return true;
+      }
     }
+    return true;
+  }
+
+  showAlertDialog(BuildContext pcontext,int value) {
+    /// Value = 0-> red
+    /// Value = 1 -> green
+    /// Value = 2 -> orange
+    String text = "Your request is in progress";
+    Color color= Colors.deepOrange;
+    IconData aIcon = Icons.cancel_outlined;
+    switch(value) {
+      case 0:
+        text="Something went wrong, request failed";
+        color= Colors.red;
+        aIcon = Icons.cancel_outlined;
+        break;
+      case 1:
+        text="Successful transaction";
+        color= Colors.green;
+        aIcon = Icons.done;
+        break;
+      case 2:
+        text = "Your request is in progress";
+        color= Colors.deepOrange;
+        break;
+    }
+    showDialog(
+      barrierDismissible: false,
+      context: pcontext,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          //title: Text("Request Status",style: TextStyle(color: color,fontWeight: FontWeight.w500),),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topRight: Radius.circular(20),bottomRight: Radius.circular(20))),
+          content: Container(
+            //width: 200,
+            //height: 70,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(height: 50,width: 2,color: color,),
+                      SizedBox(width: 6,),
+                      Text(text,style: TextStyle(color: color,fontWeight: FontWeight.bold)),
+                      SizedBox(width: 6,),
+                      if(value != 2) Icon(aIcon,color: color,size: 20,),
+                      if(value == 2) CircularProgressIndicator(color: color,)
+                    ],
+                  ),
+                  SizedBox(height: 6,),
+                  if(value != 2) TextBtn(
+                    height: 35,
+                    width: 100,
+                    title: "Done",
+                    btnColor: color,
+                    textColor: Colors.white,
+                    onTap: ()=> Navigator.pop(context),
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
   
-  approveFunc() async {
-    print("approve check allowance : $currentAllowance");
+  approveFunc(context) async {
+    debugPrint("approve check allowance : $currentAllowance");
+    Fluttertoast.showToast(
+        msg: "Your request is in progress",
+        timeInSecForIosWeb: 50,
+    );
     if(cryptochoose == "BTC"){
-      BtcContract().approve(currentTokenBalance)
-          .then((res) => {
-            // TODO : afficher un loader le temps que la res passe à true
-            print("Approve res : $res"),
+      BtcContract().approve(currentTokenBalance).then((value) =>
+      {
+        debugPrint("value : $value"),
+        value ? showAlertDialog(context, 1) : showAlertDialog(context, 0),
+        getCurrentCryptoInfo(),
+      });
+    }
+    if(cryptochoose == "CAKE"){
+      CakeContract().approve(currentTokenBalance).then((value) =>
+      {
+        debugPrint("value : $value"),
+        value ? showAlertDialog(context, 1) : showAlertDialog(context, 0),
+        getCurrentCryptoInfo(),
+      });
+    }
+    if(cryptochoose == "ETH"){
+      EthContract().approve(currentTokenBalance).then((value) =>
+      {
+        debugPrint("value : $value"),
+        value ? showAlertDialog(context, 1) : showAlertDialog(context, 0),
+        getCurrentCryptoInfo(),
+      });
+    }
+    if(cryptochoose == "FEG"){
+      FegContract().approve(currentTokenBalance).then((value) =>
+      {
+        debugPrint("value : $value"),
+        value ? showAlertDialog(context, 1) : showAlertDialog(context, 0),
+        getCurrentCryptoInfo(),
+      });
+    }
+    if(cryptochoose == "SAFEMOON"){
+      SafemoonContract().approve(currentTokenBalance).then((value) =>
+      {
+        debugPrint("value : $value"),
+        value ? showAlertDialog(context, 1) : showAlertDialog(context, 0),
+        getCurrentCryptoInfo(),
+      });
+    }
+    if(cryptochoose == "USDC"){
+      USDCContract().approve(currentTokenBalance).then((value) =>
+      {
+        debugPrint("value : $value"),
+        value ? showAlertDialog(context, 1) : showAlertDialog(context, 0),
+        getCurrentCryptoInfo(),
+      });
+    }
+    if(cryptochoose == "USDT"){
+      USDTContract().approve(currentTokenBalance).then((value) =>
+      {
+        debugPrint("value : $value"),
+        value ? showAlertDialog(context, 1) : showAlertDialog(context, 0),
+        getCurrentCryptoInfo(),
       });
     }
   }
 
-  buy(){}
+  userBnbInvest(bnbValue){
+    if(currentValSelected != 0){ // default choose
+      if(currentValSelected == 1) {
+        setState(() {
+          bnbValue = 0.1;
+        });
+      }else if(currentValSelected == 2) {
+        setState(() {
+          bnbValue = 0.5;
+        });
+      }else if(currentValSelected == 3) {
+        setState(() {
+          bnbValue = 1;
+        });
+      }else if(currentValSelected == 4) {
+        setState(() {
+          bnbValue = 3;
+        });
+      }
+      return bnbValue;
+    }
+    else{ // user write is own bnb value in input
+      if(amountController.text.trim() != "" && amountController.text.isNotEmpty){
+        bnbValue = double.parse(amountController.text);
+        if(bnbValue > 0.1){
+          return bnbValue;
+        }else{
+          return 0.1;
+        }
+      }else{
+        return 0.1; // return default value 0.1 in fail case
+      }
+    }
+  }
+
+  buy() async {
+    if(alreadyApprove()) /// check if current token is already approve by user
+    {
+      double bnbValue = userBnbInvest(0.1); // if user don't choose anything default value invest is 0.1
+      debugPrint("bnbValue :$bnbValue");
+
+      BigInt _bnbValueWithDecimal = BigInt.from(bnbValue*pow(10, currentDecimal));
+
+
+      Fluttertoast.showToast(
+        msg: "Your request is in progress",
+        timeInSecForIosWeb: 50,
+      );
+
+      /// check if current token is bnb or not
+      if(cryptochoose == "BNB") {
+        // 1bnb = priceBnbByNftb -> valeurNFTB invest
+        //_bnbValueWithDecimal
+        debugPrint("_bnbAmount : $_bnbValueWithDecimal");
+
+        PresaleContract().joinWithBNB(_bnbValueWithDecimal).then((value) =>
+        {
+          debugPrint("Buy - WithBnb : $value"),
+          value ? showAlertDialog(context, 1) : showAlertDialog(context, 0),
+          getCurrentCryptoInfo(), // update token value after transaction completed
+        });
+
+      }
+      else{
+        // buy with others tokens
+        double _tokenValueInOneBnb = await getTokenPriceInBnb(currentSCAddress);
+        double _tokenValByBnb = bnbValue*_tokenValueInOneBnb;
+
+        debugPrint("_tokenValueInOneBnb : $_tokenValueInOneBnb");
+        debugPrint("_tokenValByBnb : $_tokenValByBnb");
+
+        // params need to be send to SC
+        var _bep20Address = currentSCAddress;
+        var _bep20Amount = currentTokenBalance;
+        var _tokenAmount = BigInt.from((_tokenValByBnb*priceBnbByNFTB)/_tokenValueInOneBnb);//priceBnbByNFTB = 20000000
+        var _bnbAmount = _bnbValueWithDecimal;
+
+
+        debugPrint("----- Others Token Send I -----");
+
+        debugPrint("_bep20Address : $_bep20Address");
+        debugPrint("_bep20Amount : $_bep20Amount");
+        debugPrint("_tokenAmount : $_tokenAmount");
+        debugPrint("_bnbAmount : $_bnbAmount");
+
+        debugPrint("----- Others Token Send O -----");
+
+        PresaleContract().joinWithMultiCoin(_bep20Address,_bep20Amount,_tokenAmount,_bnbAmount).then((value) =>
+        {
+          debugPrint("Buy - WithBnb : $value"),
+          value ? showAlertDialog(context, 1) : showAlertDialog(context, 0),
+          getCurrentCryptoInfo(), // update token value after transaction completed
+        });
+
+      }
+    }else{
+      Fluttertoast.showToast(
+        msg: "You need to approve before you can buy",
+        timeInSecForIosWeb: 4,
+      );
+    }
+  }
 
   getCurrentCryptoInfo() async {
+    debugPrint("--GetCurrentCryptoInfo--");
     /// currentTokenBalance is BigInt (token balance with exp value)
     BigInt balance = BigInt.zero;
     currentTokenBalance = balance; /// Initialize to BigInt.zero at each call
@@ -78,55 +314,65 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
       balance = await BtcContract().getTokenBalance();
       var _currentDecimal = await BtcContract().getDecimal();
       var _currentAllowance = await BtcContract().allowance();
+      var _currentSCAddress = await BtcContract().getMainAddress();
       setState(() {
         currentTokenBalance = balance;
         currentDecimal = _currentDecimal;
         currentAllowance = _currentAllowance.toInt();
+        currentSCAddress = _currentSCAddress;
       });
-      print("BTC-balance : $currentTokenBalance");
+      debugPrint("BTC-balance : $currentTokenBalance");
     }
     if(cryptochoose == "CAKE"){
       balance = await CakeContract().getTokenBalance();
       var _currentDecimal = await CakeContract().getDecimal();
       var _currentAllowance = await CakeContract().allowance();
+      var _currentSCAddress = await CakeContract().getMainAddress();
       setState(() {
         currentTokenBalance = balance;
         currentDecimal = _currentDecimal;
         currentAllowance = _currentAllowance.toInt();
+        currentSCAddress = _currentSCAddress;
       });
-      print("CAKE-balance : $currentTokenBalance");
+      debugPrint("CAKE-balance : $currentTokenBalance");
     }
     if(cryptochoose == "ETH"){
       balance = await EthContract().getTokenBalance();
       var _currentDecimal = await EthContract().getDecimal();
       var _currentAllowance = await EthContract().allowance();
+      var _currentSCAddress = await EthContract().getMainAddress();
       setState(() {
         currentTokenBalance = balance;
         currentDecimal = _currentDecimal;
         currentAllowance = _currentAllowance.toInt();
+        currentSCAddress = _currentSCAddress;
       });
-      print("ETH-balance : $currentTokenBalance");
+      debugPrint("ETH-balance : $currentTokenBalance");
     }
     if(cryptochoose == "FEG"){
       balance = await FegContract().getTokenBalance();
       var _currentDecimal = await FegContract().getDecimal();
       var _currentAllowance = await FegContract().allowance();
+      var _currentSCAddress = await FegContract().getMainAddress();
       setState(() {
         currentTokenBalance = balance;
         currentDecimal = _currentDecimal;
         currentAllowance = _currentAllowance.toInt();
+        currentSCAddress = _currentSCAddress;
       });
-      print("balance : $balance");
-      print("FEG-balance : $currentTokenBalance");
+      debugPrint("balance : $balance");
+      debugPrint("FEG-balance : $currentTokenBalance");
     }
     if(cryptochoose == "SAFEMOON"){
       balance = await SafemoonContract().getTokenBalance();
       var _currentDecimal = await SafemoonContract().getDecimal();
       var _currentAllowance = await SafemoonContract().allowance();
+      var _currentSCAddress = await SafemoonContract().getMainAddress();
       setState(() {
         currentTokenBalance = balance;
         currentDecimal = _currentDecimal;
         currentAllowance = _currentAllowance.toInt();
+        currentSCAddress = _currentSCAddress;
       });
       print("SAFEM-balance : $currentTokenBalance");
     }
@@ -134,10 +380,12 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
       balance = await USDCContract().getTokenBalance();
       var _currentDecimal = await USDCContract().getDecimal();
       var _currentAllowance = await USDCContract().allowance();
+      var _currentSCAddress = await USDCContract().getMainAddress();
       setState(() {
         currentTokenBalance = balance;
         currentDecimal = _currentDecimal;
         currentAllowance = _currentAllowance.toInt();
+        currentSCAddress = _currentSCAddress;
       });
       print("USDC-balance : $currentTokenBalance");
     }
@@ -145,10 +393,12 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
       balance = await USDTContract().getTokenBalance();
       var _currentDecimal = await USDTContract().getDecimal();
       var _currentAllowance = await USDTContract().allowance();
+      var _currentSCAddress = await USDTContract().getMainAddress();
       setState(() {
         currentTokenBalance = balance;
         currentDecimal = _currentDecimal;
         currentAllowance = _currentAllowance.toInt();
+        currentSCAddress = _currentSCAddress;
       });
       print("USDT-balance : $currentTokenBalance");
     }
@@ -189,7 +439,7 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
                                 crossAxisCount: 4, // numbers of rows
                                 shrinkWrap: true, // enable page to accept scroll gridview inside column
                                 children: List.generate(widget.paymentData.length, (int index) {
-                                  print("title : ${widget.paymentData[index]['name'].toString()}");
+                                  debugPrint("title : ${widget.paymentData[index]['name'].toString()}");
                                   var title = widget.paymentData[index]['name'];
                                   var logo = widget.paymentData[index]['logo'];
                                   var radioVal = widget.paymentData[index]['valueRadio'];
@@ -354,7 +604,7 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
                     backgroundColor: Colors.white,
                     controller: amountController,
                     textColor: Colors.deepOrange,
-                    keyboardType: TextInputType.text,
+                    keyboardType: TextInputType.number,
                     onChanged: (text){
                       print("text : $text");
                       if(text != null && text.trim() != ""){
@@ -362,8 +612,8 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
                           currentValSelected = 0;
                         });
                       }else{
-                        /// Assign max value if user delete inout value
-                        currentValSelected = 4;
+                        /// Assign max min if user delete inout value
+                        currentValSelected = 1;
                       }
                     },
                   )
@@ -379,7 +629,7 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
                     title: "Approve",
                     btnColor: Colors.orangeAccent,
                     textColor: Colors.white,
-                    onTap: ()=> approveFunc(),
+                    onTap: ()=> approveFunc(context),
                   ),
                   TextBtn(
                     height: 35,
@@ -406,8 +656,8 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
                     InkWell(
                       child: Text("© WainCorp - 2021"),
                       onTap: (){
-                        BtcContract().allowance();
-                        //Api().getCurrentTokenPrice("0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c");
+                        //BtcContract().allowance();
+                        Api().getCurrentTokenPrice("0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c");
                       },
                     ),
                   ],

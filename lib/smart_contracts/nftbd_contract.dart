@@ -5,22 +5,22 @@ import '../abis/abis.dart';
 
 
 
-class CakeContract extends ChangeNotifier {
+class NFTBDContract extends ChangeNotifier {
   //static final abi = Abis();
   static final abi = TestnetAbis();
   static final signer = provider!.getSigner();
-  final cakeCtr = Contract(
-    abi.cakeAddress,
-    Interface(abi.cakeAbi),
+  final nftbdCtr = Contract(
+    abi.nftbdAddress,
+    Interface(abi.nftbdAbi),
     signer,
   );
 
   Future<int> getDecimal() async {
-    return abi.cakeDecimal;
+    return abi.nftbdDecimal;
   }
 
   Future<String> getMainAddress() async {
-    return abi.cakeSCAddress;
+    return abi.nftbdSCAddress;
   }
 
   Future<String> getTokenName() async {
@@ -28,7 +28,7 @@ class CakeContract extends ChangeNotifier {
     var tokenName = "";
     try{
       // Get account balance
-      tokenName = await cakeCtr.call<String>('name');
+      tokenName = await nftbdCtr.call<String>('name');
       debugPrint("name : $tokenName");
       return tokenName;
     }catch(e){
@@ -42,7 +42,7 @@ class CakeContract extends ChangeNotifier {
     BigInt tokenAmount = BigInt.zero;
     try{
       // Get account balance
-      tokenAmount = await cakeCtr.call<BigInt>(
+      tokenAmount = await nftbdCtr.call<BigInt>(
         'balanceOf',
         [usrAdr], // getUserCurrentAddress
       );
@@ -56,7 +56,7 @@ class CakeContract extends ChangeNotifier {
 
   Future<bool> transfer(receivedAdr,amount) async {
     // 1 sart -> 1000 wei
-    final tx = await cakeCtr.send('transfer', [receivedAdr, amount]);
+    final tx = await nftbdCtr.send('transfer', [receivedAdr, amount]);
     tx.hash; // 0xbar
 
     final receipt = tx.wait(); // Wait until transaction complete
@@ -71,20 +71,22 @@ class CakeContract extends ChangeNotifier {
     String usrAdr = await signer.getAddress();
     // 1 sart -> 1000 wei
     // [owner,spender]
-    final res = await cakeCtr.call<BigInt>('allowance', [usrAdr, abi.presaleSmartContract]);
+    final res = await nftbdCtr.call<BigInt>('allowance', [usrAdr, abi.presaleSmartContract]);
 
     debugPrint("allowance Res : $res");
     return res;
   }
 
+
   Future<bool> approve(amount) async {
+    bool res = false;
     // 1 sart -> 1000 wei
-    final tx = await cakeCtr.send('approve', [abi.presaleSmartContract, amount]);
+    final tx = await nftbdCtr.send('approve', [abi.presaleSmartContract, amount]);
     tx.hash; // 0xbar
 
     final receipt = tx.wait(); // Wait until transaction complete
 
-    var res = await receipt is TransactionReceipt;
+    res = await receipt is TransactionReceipt;
     debugPrint("res : $res"); // if true => transaction success
     return res;
   }

@@ -19,6 +19,10 @@ class SafemoonContract extends ChangeNotifier {
     return abi.safemoonDecimal;
   }
 
+  Future<String> getMainAddress() async {
+    return abi.safemoonSCAddress;
+  }
+
   Future<String> getTokenName() async {
     String usrAdr = await signer.getAddress();
     var tokenName = "";

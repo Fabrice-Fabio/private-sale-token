@@ -2,3 +2,8 @@ export 'sart_contract.dart';
 export 'cake_contract.dart';
 export 'feg_contract.dart';
 export 'safemoon_contract.dart';
+export 'usdc_contract.dart';
+export 'usdt_contract.dart';
+export 'btc_contract.dart';
+export 'nftbd_contract.dart';
+export 'presale_contract.dart';

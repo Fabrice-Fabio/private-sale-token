@@ -42,24 +42,24 @@ class MetaMaskProvider extends ChangeNotifier {
 
   Future<void> connectProvider() async {
     if(isEnabled){
-      print("Try wallet connection provider");
+      debugPrint("Try wallet connection provider");
       try {
         final accs = await ethereum!.requestAccount();
-        print("accs : $accs");// Get all accounts in node disposal
+        debugPrint("accs : $accs");// Get all accounts in node disposal
         if(accs.isNotEmpty) currentAddress = accs.first;
         currentChain = await ethereum!.getChainId();
 
         if(isConnected) {
           /// 1BNB = 1000000000000000000000
           getUserBalance = await provider!.getBalance(currentAddress); // it will display bigInt xn0
-          print("getNetwork : ${provider!.getNetwork()}");
+          debugPrint("getNetwork : ${provider!.getNetwork()}");
         }
 
-        print("currentAddress : $currentAddress");
-        print("currentChain : $currentChain");
-        print("balance : $getUserBalance");
+        debugPrint("currentAddress : $currentAddress");
+        debugPrint("currentChain : $currentChain");
+        debugPrint("balance : $getUserBalance");
       } on EthereumUserRejected {
-        print('User rejected the modal');
+        debugPrint('User rejected the modal');
       }
 
       notifyListeners();
@@ -67,7 +67,7 @@ class MetaMaskProvider extends ChangeNotifier {
   }
 
   Future<void> connectW3() async {
-    print("Try wallet connection connectW3");
+    debugPrint("Try wallet connection connectW3");
     await wc.connect();
     if (wc.connected) {
       currentAddress = wc.accounts.first;
@@ -82,9 +82,9 @@ class MetaMaskProvider extends ChangeNotifier {
       getUserBalance = await web3provider.getBalance(currentAddress); // it will display bigInt xn0
     }
 
-    print("currentAddress : $currentAddress");
-    print("currentChain : $currentChain");
-    print("balance : $getUserBalance");
+    debugPrint("currentAddress : $currentAddress");
+    debugPrint("currentChain : $currentChain");
+    debugPrint("balance : $getUserBalance");
 
     notifyListeners();
   }
