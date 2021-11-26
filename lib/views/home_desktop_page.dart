@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:flutter_web3/ethers.dart' as eth;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:privatesale/api/api.dart';
 import 'package:privatesale/smart_contracts/btc_contract.dart';
@@ -31,6 +32,7 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
   double priceBnbByNFTB = 20000000; // 1BNB -> 20000000 NFTB
 
   BigInt currentTokenBalance = BigInt.zero; // selected token balance in this wallet
+  BigInt curBnbBalance = BigInt.zero; // selected token balance in this wallet
   int currentDecimal = 18; // selected token decimal (DEFAULT 18 = BNB DEC)
   String currentSCAddress = ""; // selected token sc address
   int currentAllowance = 0; // check if user are already approve current token payment and get value
@@ -402,7 +404,17 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
       });
       print("USDT-balance : $currentTokenBalance");
     }
-    /// check if cryptochoose == "BNB"
+    if(cryptochoose == "BNB"){
+      /// update bnbBalance
+      /// TODO : check if usr connect with meta or walletconnect
+      final signer = eth.provider!.getSigner();
+      BigInt _bnbBalance = await signer.getBalance();
+      setState(() {
+        curBnbBalance = _bnbBalance;
+      });
+      debugPrint("curBnbBalanceB : $_bnbBalance");
+      debugPrint("curBnbBalanceC : $curBnbBalance");
+    }
   }
 
   @override
@@ -509,7 +521,9 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
                             Consumer<WalletProvider>(
                               builder: (context, provider, child) {
                                 return cryptochoose == "BNB" ?
-                                Text("${getBalanceWithoutDecimal(bnbBalance,18)}",style: TextStyle(fontWeight: FontWeight.w600,fontSize: 35 )) :
+                                Text("${curBnbBalance == BigInt.zero ? getBalanceWithoutDecimal(bnbBalance,18) :
+                                getBalanceWithoutDecimal(curBnbBalance,18)}",
+                                    style: TextStyle(fontWeight: FontWeight.w600,fontSize: 35 )) :
                                 Text("${getBalanceWithoutDecimal(currentTokenBalance,currentDecimal)}",style: TextStyle(fontWeight: FontWeight.w600,fontSize: 35 ));
                               },
                             ),
