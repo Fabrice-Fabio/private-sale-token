@@ -15,11 +15,13 @@ class PresaleContract extends ChangeNotifier {
     signer,
   );
 
-
-
   Future<bool> joinWithBNB(BigInt amount) async {
-    debugPrint("Ask-joinWithBNB");
-    final tx = await presaleCtr.send('joinWithBNB', [amount]);
+    debugPrint("Ask-joinWithBNB : $amount");
+    final tx = await presaleCtr.send(
+      'joinWithBNB',
+      [],
+      TransactionOverride(value: amount),
+    );
     tx.hash; // 0xbar
     debugPrint("hash : ${tx.hash}");
 

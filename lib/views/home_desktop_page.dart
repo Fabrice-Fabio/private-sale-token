@@ -31,7 +31,7 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
   double priceBnbByNFTB = 20000000; // 1BNB -> 20000000 NFTB
 
   BigInt currentTokenBalance = BigInt.zero; // selected token balance in this wallet
-  int currentDecimal = 8; // selected token decimal (DEFAULT 8 = BNB DEC)
+  int currentDecimal = 18; // selected token decimal (DEFAULT 18 = BNB DEC)
   String currentSCAddress = ""; // selected token sc address
   int currentAllowance = 0; // check if user are already approve current token payment and get value
 
@@ -402,6 +402,7 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
       });
       print("USDT-balance : $currentTokenBalance");
     }
+    /// check if cryptochoose == "BNB"
   }
 
   @override
@@ -600,7 +601,7 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
                     height: 100,
                     width: 350,
                     borderColor: Colors.deepOrange,
-                    placeholder: "Enter your own value",
+                    placeholder: "Enter value in bnb (1)",
                     backgroundColor: Colors.white,
                     controller: amountController,
                     textColor: Colors.deepOrange,
