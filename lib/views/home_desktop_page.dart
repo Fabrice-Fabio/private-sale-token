@@ -1,7 +1,10 @@
 import 'dart:math';
 
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_web3/ethers.dart' as eth;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:privatesale/api/api.dart';
@@ -15,6 +18,8 @@ import 'package:privatesale/widgets/centered_view/centered_view.dart';
 import 'package:privatesale/widgets/navigation_bar/navigation_bar.dart';
 import 'package:privatesale/widgets/utils/export_utils.dart';
 import 'package:provider/provider.dart';
+import 'dart:html' as html;
+
 
 class HomeDesktopPage extends StatefulWidget {
   final paymentData;
@@ -231,9 +236,17 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
         if(bnbValue > 0.1){
           return bnbValue;
         }else{
+          Fluttertoast.showToast(
+            msg: "Default value to invest 0.1 BNB",
+            timeInSecForIosWeb: 5,
+          );
           return 0.1;
         }
       }else{
+        Fluttertoast.showToast(
+          msg: "Default value to invest 0.1 BNB",
+          timeInSecForIosWeb: 5,
+        );
         return 0.1; // return default value 0.1 in fail case
       }
     }
@@ -428,7 +441,20 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
           child: Column(
             children: [
               NavigationBar(),
-              Text("✨ Join NFT Breed Presale ✨ ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40),),
+              Text("✨ WELCOME TO PRIVATESALE ✨ ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40),),
+              SizedBox(
+                child: TextLiquidFill(
+                  text: 'NFT BREED',
+                  waveColor: Colors.deepOrange,
+                  boxBackgroundColor: Colors.white,
+                  textStyle: const TextStyle(
+                    fontSize: 40.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black
+                  ),
+                  boxHeight: 100,
+                ),
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -440,57 +466,100 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Flexible(
-                    child: Container(
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(border: Border.all()),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Text("Choose your payment method", style: TextStyle(color: Colors.black, fontSize: 17),),
-                            AnimationLimiter(
-                              child: GridView.count(
-                                crossAxisCount: 4, // numbers of rows
-                                shrinkWrap: true, // enable page to accept scroll gridview inside column
-                                children: List.generate(widget.paymentData.length, (int index) {
+                    child: Card(
+                      elevation: 10,
+                      child: Container(
+                        //height: 500,
+                        padding: EdgeInsets.all(5),
+                        //decoration: BoxDecoration(border: Border.all()),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              Text("Select your payment method", style: TextStyle(color: Colors.black, fontSize: 17),),
+                              SizedBox(height: 10,),
+                              StaggeredGridView.countBuilder(
+                                crossAxisCount: 4,
+                                mainAxisSpacing: 2,
+                                crossAxisSpacing: 2,
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: widget.paymentData.length,
+                                itemBuilder: (BuildContext context, int index) {
                                   debugPrint("title : ${widget.paymentData[index]['name'].toString()}");
                                   var title = widget.paymentData[index]['name'];
                                   var logo = widget.paymentData[index]['logo'];
                                   var radioVal = widget.paymentData[index]['valueRadio'];
-                                  return AnimationConfiguration.staggeredGrid(
-                                    position: index,
-                                    duration: Duration(milliseconds: 400),
-                                    columnCount: 5,
-                                    child: SlideAnimation(
-                                      verticalOffset: 50.0,
-                                      child: FlipAnimation(
-                                        child: SingleChildScrollView(
-                                          child: Column(
-                                            children: [
-                                              PaymentCard(title: title,assetPath: logo),
-                                              Radio(
-                                                value: radioVal,
-                                                groupValue: val,
-                                                activeColor: Colors.deepOrange,
-                                                onChanged: (x) {
-                                                  setState(() {
-                                                    val = x as int?;
-                                                    cryptochoose = title.toString();
-                                                  });
-                                                  getCurrentCryptoInfo();
-                                                  print('val : $val');
-                                                },
-                                              ),
-                                            ],
-                                          ),
+                                  return Container(
+                                    //height: 1500,
+                                    color: Colors.black38,
+                                    child: Column(
+                                      children: [
+                                        Expanded(child: PaymentCard(title: title,assetPath: logo)),
+                                        Radio(
+                                          hoverColor: Colors.orangeAccent,
+                                          fillColor: MaterialStateProperty.all(Colors.white),
+                                          value: radioVal,
+                                          groupValue: val,
+                                          onChanged: (x) {
+                                            setState(() {
+                                              val = x as int?;
+                                              cryptochoose = title.toString();
+                                            });
+                                            getCurrentCryptoInfo();
+                                            print('val : $val');
+                                          },
                                         ),
-                                      ),
+                                      ],
                                     ),
                                   );
                                 },
-                                ),
+                                staggeredTileBuilder: (int index) => StaggeredTile.count(1,1.2),
                               ),
-                            ),
-                          ],
+                              /*AnimationLimiter(
+                                child: GridView.count(
+                                  crossAxisCount: 4, // numbers of rows
+                                  shrinkWrap: true, // enable page to accept scroll gridview inside column
+                                  children: List.generate(widget.paymentData.length, (int index) {
+                                    debugPrint("title : ${widget.paymentData[index]['name'].toString()}");
+                                    var title = widget.paymentData[index]['name'];
+                                    var logo = widget.paymentData[index]['logo'];
+                                    var radioVal = widget.paymentData[index]['valueRadio'];
+                                    return AnimationConfiguration.staggeredGrid(
+                                      position: index,
+                                      duration: Duration(milliseconds: 400),
+                                      columnCount: 5,
+                                      child: SlideAnimation(
+                                        verticalOffset: 50.0,
+                                        child: FlipAnimation(
+                                          child: SingleChildScrollView(
+                                            child: Column(
+                                              children: [
+                                                PaymentCard(title: title,assetPath: logo),
+                                                Radio(
+                                                  value: radioVal,
+                                                  groupValue: val,
+                                                  activeColor: Colors.deepOrange,
+                                                  onChanged: (x) {
+                                                    setState(() {
+                                                      val = x as int?;
+                                                      cryptochoose = title.toString();
+                                                    });
+                                                    getCurrentCryptoInfo();
+                                                    print('val : $val');
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  ),
+                                ),
+                              ),*/
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -501,7 +570,7 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text("1 BNB = 10000000000 NFTBD\n",style: TextStyle(fontWeight: FontWeight.w400,fontSize: 25 )),
+                            Text("1 BNB = $priceBnbByNFTB NFTBD\n",style: TextStyle(fontWeight: FontWeight.w400,fontSize: 25 )),
                             Text("Your $cryptochoose balance : \n", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20 ),),
                             /*StreamBuilder<BigInt>(
                               stream: WalletProvider().getBalanceStream,
@@ -530,7 +599,39 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
                             SizedBox(height: 6,),
                             Text("What's NFT Breed ? \n", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20, )),
                             Text("NFTBreed is a new concept and game to breed and collect so-adorable creatures like Cat , Dog  and Horse  ! Each creature is one-of-a-kind and 100% owned by collector; it cannot be replicated, taken away, or destroyed.",
-                              style: TextStyle(color: Colors.grey,),textAlign: TextAlign.end,)
+                              style: TextStyle(color: Colors.grey,),textAlign: TextAlign.end,),
+                            SizedBox(height: 6,),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(5),
+                                  child: TextBtn(
+                                    height: 35,
+                                    width: 100,
+                                    title: "Website",
+                                    btnColor: Colors.white70,
+                                    textColor: Colors.deepOrangeAccent,
+                                    onTap: ()=> {
+                                      html.window.open("https://nftbreed.net/", '_blank'),
+                                    },
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(5),
+                                  child: TextBtn(
+                                    height: 35,
+                                    width: 100,
+                                    title: "Whitepaper",
+                                    btnColor: Colors.deepOrangeAccent,
+                                    textColor: Colors.white,
+                                    onTap: ()=> {
+                                      html.window.open("https://nft-breed.gitbook.io/whitepaper/", '_blank'),
+                                    },
+                                  ),
+                                )
+                              ],
+                            )
                           ],
                         ),
                       )
@@ -621,7 +722,7 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
                     textColor: Colors.deepOrange,
                     keyboardType: TextInputType.number,
                     onChanged: (text){
-                      print("text : $text");
+                      debugPrint("inputValue : $text");
                       if(text != null && text.trim() != ""){
                         setState(() {
                           currentValSelected = 0;

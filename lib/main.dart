@@ -4,6 +4,7 @@ import 'package:privatesale/wallet/walletprovider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 

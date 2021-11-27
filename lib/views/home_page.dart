@@ -18,7 +18,7 @@ class _HomePageState extends State<HomePage> {
   List paymentData = [];
 
   Future<String> getPaymentData() async {
-    var paymentJson = await rootBundle.loadString("/data/paymentMethod.json");
+    var paymentJson = await rootBundle.loadString("paymentMethod.json");
     setState(() {
       paymentData = json.decode(paymentJson);
     });

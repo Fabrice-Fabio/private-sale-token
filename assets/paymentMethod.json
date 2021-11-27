@@ -1,0 +1,50 @@
+[
+  {
+    "name": "BNB",
+    "logo": "assets/bnbLogo.png",
+    "valueRadio": 1,
+    "mainSCAddress": ""
+  },
+  {
+    "name": "BTC",
+    "logo": "assets/btcLogo.png",
+    "valueRadio": 2,
+    "mainSCAddress": "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c"
+  },
+  {
+    "name": "CAKE",
+    "logo": "assets/cakeLogo.png",
+    "valueRadio": 3,
+    "mainSCAddress": "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82"
+  },
+  {
+    "name": "ETH",
+    "logo": "assets/ethLogo.png",
+    "valueRadio": 4,
+    "mainSCAddress": "0x2170ed0880ac9a755fd29b2688956bd959f933f8"
+  },
+  {
+    "name": "FEG",
+    "logo": "assets/fegLogo.png",
+    "valueRadio": 5,
+    "mainSCAddress": "0xacfc95585d80ab62f67a14c566c1b7a49fe91167"
+  },
+  {
+    "name": "SAFEMOON",
+    "logo": "assets/safemoon.png",
+    "valueRadio": 6,
+    "mainSCAddress": "0x8076c74c5e3f5852037f31ff0093eeb8c8add8d3"
+  },
+  {
+    "name": "USDC",
+    "logo": "assets/usdc.png",
+    "valueRadio": 7,
+    "mainSCAddress": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"
+  },
+  {
+    "name": "USDT",
+    "logo": "assets/usdt.png",
+    "valueRadio": 8,
+    "mainSCAddress": "0x55d398326f99059ff775485246999027b3197955"
+  }
+]
