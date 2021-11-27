@@ -81,9 +81,9 @@ class WalletProvider with ChangeNotifier {
   }
 
   Future<void> connectW3() async {
-    print("ConnectW3");
+    debugPrint("ConnectW3");
 
-    print("Try wallet connection connectW3");
+    debugPrint("Try wallet connection connectW3");
     await wc.connect();
     if (wc.connected) {
       currentAddress = wc.accounts.first;
@@ -97,9 +97,9 @@ class WalletProvider with ChangeNotifier {
       getUserBalance = await web3provider.getBalance(currentAddress); // it will display bigInt xn0
     }
 
-    print("currentAddress : $currentAddress");
-    print("currentChain : $currentChain");
-    print("balance : $getUserBalance");
+    debugPrint("currentAddress : $currentAddress");
+    debugPrint("currentChain : $currentChain");
+    debugPrint("balance : $getUserBalance");
 
     notifyListeners();
   }

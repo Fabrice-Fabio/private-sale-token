@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_web3/flutter_web3.dart';
-import 'package:privatesale/wallet/metamaskprovider.dart';
 import 'package:privatesale/wallet/walletprovider.dart';
 import 'package:privatesale/widgets/connect_wallet/connect_wallet.dart';
 import 'package:provider/provider.dart';
@@ -44,7 +43,6 @@ Widget desktopNavBar(context){
         ),
         Consumer<WalletProvider>(
             builder: (context, provider, child) {
-              print("fuck222: ${provider.currentAddress}");
               return Text(provider.currentAddress);
             }
         ),
@@ -73,62 +71,51 @@ Widget mobileNavBar(context){
           child: Center(child: Text('PRIVATESALE',style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 25),)),
         ),
         /// TODO layourbuilder check mobile device and display
-        ListTile(title: Text('0x1d681e190cdf38bCc3912c5d1a51328a20E61C84',),),
+        ListTile(
+          title: Consumer<WalletProvider>(
+            builder: (context, provider, child) {
+              return Text(provider.currentAddress);
+            }
+          ),
+        ),
         const Divider(thickness: 1,color: Colors.grey,),
-        ListTile(title: mobileWalletBtn(),),
+        const ListTile(title: ConnectWalletMobile(),),
       ],
     ),
   );
 }
 
+class ConnectWalletMobile extends StatefulWidget {
+  const ConnectWalletMobile({Key? key}) : super(key: key);
 
-Widget mobileWalletBtn(){
-  String title = "Wallet connect";
-
-  Future<String> connectMobileW3() async {
-    print("Try wallet connection connectW3");
-    var currentAddress="";
-    var currentChain = 56;
-    final wc = WalletConnectProvider.fromRpc(
-      {56: 'https://bsc-dataseed.binance.org/'},
-      chainId: 56,
-      network: 'binance',
-    );
-    await wc.connect();
-    if (wc.connected) {
-      currentAddress = wc.accounts.first;
-      currentChain = wc.chainId as int;
-    }
-    final web3provider = Web3Provider.fromWalletConnect(wc);
-
-    /// 1BNB = 1000000000000000000000
-    var getUserBalance = await web3provider.getBalance(currentAddress); // it will display bigInt xn0
-
-    print("currentAddress : $currentAddress");
-    print("currentChain : $currentChain");
-    print("balance : $getUserBalance");
-
-    return currentAddress;
-  }
-
-  return InkWell(
-    child: Container(
-      width: 250,
-      padding: EdgeInsets.symmetric(horizontal: 60,vertical: 15),
-      child: Text(title,
-        overflow: TextOverflow.ellipsis,
-        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.white),),
-      decoration: BoxDecoration(
-        color: Color.fromARGB(227, 229, 120, 37),
-        borderRadius: BorderRadius.circular(5),
-      ),
-    ),
-    onTap: () async =>  {
-      //context.read<MetaMaskProvider>().connect(),
-      connectMobileW3(),
-    },
-  );
+  @override
+  _ConnectWalletMobileState createState() => _ConnectWalletMobileState();
 }
+
+class _ConnectWalletMobileState extends State<ConnectWalletMobile> {
+  @override
+  Widget build(BuildContext context) {
+    String title = "Connect to wallet";
+
+    return InkWell(
+      child: Container(
+        width: 250,
+        padding: EdgeInsets.symmetric(horizontal: 60,vertical: 15),
+        child: Text(title,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.white),),
+        decoration: BoxDecoration(
+          color: Color.fromARGB(227, 229, 120, 37),
+          borderRadius: BorderRadius.circular(5),
+        ),
+      ),
+      onTap: () async => {
+        context.read<WalletProvider>().connectW3(),
+      },
+    );
+  }
+}
+
 
 class _NavBarItem extends StatelessWidget {
   final String title;
