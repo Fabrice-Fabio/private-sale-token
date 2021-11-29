@@ -23,6 +23,10 @@ class FegContract extends ChangeNotifier {
     return abi.fegSCAddress;
   }
 
+  Future<String> getTokenAddress() async {
+    return abi.fegAddress;
+  }
+
   Future<String> getTokenName() async {
     String usrAdr = await signer.getAddress();
     var tokenName = "";

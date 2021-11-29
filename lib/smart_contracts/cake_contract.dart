@@ -23,6 +23,10 @@ class CakeContract extends ChangeNotifier {
     return abi.cakeSCAddress;
   }
 
+  Future<String> getTokenAddress() async {
+    return abi.cakeAddress;
+  }
+
   Future<String> getTokenName() async {
     String usrAdr = await signer.getAddress();
     var tokenName = "";

@@ -23,6 +23,10 @@ class USDTContract extends ChangeNotifier {
     return abi.usdtSCAddress;
   }
 
+  Future<String> getTokenAddress() async {
+    return abi.usdtAddress;
+  }
+
   Future<String> getTokenName() async {
     String usrAdr = await signer.getAddress();
     var tokenName = "";

@@ -23,6 +23,10 @@ class BtcContract extends ChangeNotifier {
     return abi.btcSCAddress;
   }
 
+  Future<String> getTokenAddress() async {
+    return abi.btcAddress;
+  }
+
   Future<String> getTokenName() async {
     String usrAdr = await signer.getAddress();
     var tokenName = "";

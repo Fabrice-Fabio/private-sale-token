@@ -23,6 +23,10 @@ class EthContract extends ChangeNotifier {
     return abi.ethSCAddress;
   }
 
+  Future<String> getTokenAddress() async {
+    return abi.ethAddress;
+  }
+
   Future<String> getTokenName() async {
     String usrAdr = await signer.getAddress();
     var tokenName = "";

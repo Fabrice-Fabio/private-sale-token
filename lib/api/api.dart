@@ -2,8 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class Api {
-
-
   var dio = Dio();
   String urlTokenPrice = "https://tokenprice.herokuapp.com";
 
@@ -18,6 +16,17 @@ class Api {
       debugPrint("err api tokenprice : $e");
     }
     return 0.0;
+  }
+
+  Future<String> getPaymentMethod() async {
+    try {
+      var response = await dio.get('https://privatesale.nftbreed.net/paymentMethod.json');
+      debugPrint("PaymentMethod : ${response.data}");
+      return response.data; // price is int
+    } catch (e) {
+      debugPrint("err api tokenprice : $e");
+    }
+    return "";
   }
 
 }

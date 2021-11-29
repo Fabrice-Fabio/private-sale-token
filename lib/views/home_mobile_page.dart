@@ -33,9 +33,13 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
 
   BigInt currentTokenBalance = BigInt.zero; // selected token balance in this wallet
   BigInt curBnbBalance = BigInt.zero; // selected token balance in this wallet
-  int currentDecimal = 18; // selected token decimal (DEFAULT 18 = BNB DEC)
-  String currentSCAddress = ""; // selected token sc address
+  int currentDecimal = 18; // selected token decimal
+  int bnbDecimal = 18; // selected token decimal (DEFAULT 18 = BNB DEC)
+  int nftbDecimal = 9; // selected token decimal (DEFAULT 18 = BNB DEC)
+  String currentSCAddress = ""; // selected token sc address (use same SC for mainnet and testnet to get currentprice)
+  String currentTokenAddress = ""; // selected token sc address
   int currentAllowance = 0; // check if user are already approve current token payment and get value
+
 
 
   getTokenPriceInBnb(currentAddress) async {
@@ -43,7 +47,6 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
     debugPrint("getTokenPriceInBnb : $res");
     return res;
   }
-
 
   getBalanceWithoutDecimal(BigInt tokenBalance,int decimal){
     debugPrint("---tokenBalance : $tokenBalance && decimal : $decimal ---");
@@ -253,7 +256,7 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
       double bnbValue = userBnbInvest(0.1); // if user don't choose anything default value invest is 0.1
       debugPrint("bnbValue :$bnbValue");
 
-      BigInt _bnbValueWithDecimal = BigInt.from(bnbValue*pow(10, currentDecimal));
+      BigInt _bnbValueWithDecimal = BigInt.from(bnbValue*pow(10, bnbDecimal));
 
 
       Fluttertoast.showToast(
@@ -284,9 +287,9 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
         debugPrint("_tokenValByBnb : $_tokenValByBnb");
 
         // params need to be send to SC
-        var _bep20Address = currentSCAddress;
-        var _bep20Amount = currentTokenBalance;
-        var _tokenAmount = BigInt.from((_tokenValByBnb*priceBnbByNFTB)/_tokenValueInOneBnb);//priceBnbByNFTB = 20000000
+        var _bep20Address = currentTokenAddress;
+        var _bep20Amount = BigInt.from((_tokenValByBnb)*pow(10, currentDecimal));
+        var _tokenAmount = BigInt.from((bnbValue*priceBnbByNFTB)*pow(10, nftbDecimal));//priceBnbByNFTB = 20000000
         var _bnbAmount = _bnbValueWithDecimal;
 
 
@@ -325,24 +328,28 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
       var _currentDecimal = await BtcContract().getDecimal();
       var _currentAllowance = await BtcContract().allowance();
       var _currentSCAddress = await BtcContract().getMainAddress();
+      var _currentTokenAddress = await BtcContract().getTokenAddress();
       setState(() {
         currentTokenBalance = balance;
         currentDecimal = _currentDecimal;
         currentAllowance = _currentAllowance.toInt();
         currentSCAddress = _currentSCAddress;
+        currentTokenAddress = _currentTokenAddress;
       });
-      debugPrint("BTC-balance : $currentTokenBalance");
+      debugPrint("BTC-balanceee : $currentTokenBalance");
     }
     if(cryptochoose == "CAKE"){
       balance = await CakeContract().getTokenBalance();
       var _currentDecimal = await CakeContract().getDecimal();
       var _currentAllowance = await CakeContract().allowance();
       var _currentSCAddress = await CakeContract().getMainAddress();
+      var _currentTokenAddress = await CakeContract().getTokenAddress();
       setState(() {
         currentTokenBalance = balance;
         currentDecimal = _currentDecimal;
         currentAllowance = _currentAllowance.toInt();
         currentSCAddress = _currentSCAddress;
+        currentTokenAddress = _currentTokenAddress;
       });
       debugPrint("CAKE-balance : $currentTokenBalance");
     }
@@ -351,11 +358,13 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
       var _currentDecimal = await EthContract().getDecimal();
       var _currentAllowance = await EthContract().allowance();
       var _currentSCAddress = await EthContract().getMainAddress();
+      var _currentTokenAddress = await EthContract().getTokenAddress();
       setState(() {
         currentTokenBalance = balance;
         currentDecimal = _currentDecimal;
         currentAllowance = _currentAllowance.toInt();
         currentSCAddress = _currentSCAddress;
+        currentTokenAddress = _currentTokenAddress;
       });
       debugPrint("ETH-balance : $currentTokenBalance");
     }
@@ -364,11 +373,13 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
       var _currentDecimal = await FegContract().getDecimal();
       var _currentAllowance = await FegContract().allowance();
       var _currentSCAddress = await FegContract().getMainAddress();
+      var _currentTokenAddress = await FegContract().getTokenAddress();
       setState(() {
         currentTokenBalance = balance;
         currentDecimal = _currentDecimal;
         currentAllowance = _currentAllowance.toInt();
         currentSCAddress = _currentSCAddress;
+        currentTokenAddress = _currentTokenAddress;
       });
       debugPrint("balance : $balance");
       debugPrint("FEG-balance : $currentTokenBalance");
@@ -378,11 +389,13 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
       var _currentDecimal = await SafemoonContract().getDecimal();
       var _currentAllowance = await SafemoonContract().allowance();
       var _currentSCAddress = await SafemoonContract().getMainAddress();
+      var _currentTokenAddress = await SafemoonContract().getTokenAddress();
       setState(() {
         currentTokenBalance = balance;
         currentDecimal = _currentDecimal;
         currentAllowance = _currentAllowance.toInt();
         currentSCAddress = _currentSCAddress;
+        currentTokenAddress = _currentTokenAddress;
       });
       print("SAFEM-balance : $currentTokenBalance");
     }
@@ -391,11 +404,13 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
       var _currentDecimal = await USDCContract().getDecimal();
       var _currentAllowance = await USDCContract().allowance();
       var _currentSCAddress = await USDCContract().getMainAddress();
+      var _currentTokenAddress = await USDCContract().getTokenAddress();
       setState(() {
         currentTokenBalance = balance;
         currentDecimal = _currentDecimal;
         currentAllowance = _currentAllowance.toInt();
         currentSCAddress = _currentSCAddress;
+        currentTokenAddress = _currentTokenAddress;
       });
       print("USDC-balance : $currentTokenBalance");
     }
@@ -404,11 +419,13 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
       var _currentDecimal = await USDTContract().getDecimal();
       var _currentAllowance = await USDTContract().allowance();
       var _currentSCAddress = await USDTContract().getMainAddress();
+      var _currentTokenAddress = await USDCContract().getTokenAddress();
       setState(() {
         currentTokenBalance = balance;
         currentDecimal = _currentDecimal;
         currentAllowance = _currentAllowance.toInt();
         currentSCAddress = _currentSCAddress;
+        currentTokenAddress = _currentTokenAddress;
       });
       print("USDT-balance : $currentTokenBalance");
     }
@@ -517,7 +534,7 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
                             height: 35,
                             width: 100,
                             title: "Website",
-                            btnColor: Colors.white70,
+                            btnColor: Colors.grey[200],
                             textColor: Colors.deepOrangeAccent,
                             onTap: ()=> {
                               html.window.open("https://nftbreed.net/", '_blank'),
@@ -543,7 +560,7 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
                 ),
               ),
               SizedBox(height: 30,),
-              Text("Select or enter your investissement value", style: TextStyle(color: Colors.black, fontSize: 17),),
+              Text("Select or enter your investissement value \n 0.1 min", style: TextStyle(color: Colors.black, fontSize: 17),),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
