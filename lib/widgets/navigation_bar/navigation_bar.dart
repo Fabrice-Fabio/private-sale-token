@@ -65,7 +65,7 @@ Widget mobileNavBar(context){
         const DrawerHeader(
           decoration: BoxDecoration(
             /// TODO : put my logo in bckground
-            image: DecorationImage(image: AssetImage("assets/logo.png")),
+            image: DecorationImage(image: AssetImage("assets/favicon.png")),
             color: Colors.red,
           ),
           child: Center(child: Text('PRIVATESALE',style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 25),)),
