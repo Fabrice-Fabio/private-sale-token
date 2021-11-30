@@ -442,6 +442,97 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
     }
   }
 
+  showInitDialog() {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("WELCOME TO NFTBREED PRIVATESALE"),
+          //shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topRight: Radius.circular(20),bottomRight: Radius.circular(20))),
+          content: Container(
+            //width: 200,
+            //height: 70,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Holder with >100M ( Diamond 💎 club)\n"
+                      "Holder with >20M-99M ( Gold 🥇 club )\n"
+                      "Holder with > 1M - 19M ( Silver 🥈 club)\n"
+                      "Holder with > 500K - 999K ( Bronze 🥉 club)\n"),
+                  const SizedBox(height: 6,),
+                  const Text("Diamond 💎 club will get 3 rare nft card after hold 1 month\n"
+                      "Gold 🥇 club 2 rare nft card after 5 weeks\n"
+                      "Silver 🥈 club 1 rare nft card after 6 weeks\n"
+                      "Bronze 🥉 club 1 rare nft card after 7 weeks\n"),
+                  const SizedBox(height: 6,),
+                  TextBtn(
+                    height: 35,
+                    width: 100,
+                    title: "Close",
+                    btnColor: Colors.deepOrange,
+                    textColor: Colors.white,
+                    onTap: ()=> Navigator.pop(context),
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  resumeDialog() async {
+    //var nftbreedBalance = await getNftbreedValue();
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Your resume"),
+          //shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topRight: Radius.circular(20),bottomRight: Radius.circular(20))),
+          content: Container(
+            //width: 200,
+            //height: 70,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("NFTBREED Value : nftbreedBalance"),
+                  const SizedBox(height: 6,),
+                  TextBtn(
+                    height: 35,
+                    width: 100,
+                    title: "Close",
+                    btnColor: Colors.deepOrange,
+                    textColor: Colors.white,
+                    onTap: ()=> Navigator.pop(context),
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback(
+            (_) => showInitDialog()
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     BigInt bnbBalance = Provider.of<WalletProvider>(context, listen: true).getUserBalance;
@@ -546,9 +637,23 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
                           child: TextBtn(
                             height: 35,
                             width: 100,
-                            title: "Whitepaper",
+                            title: "Resume",
                             btnColor: Colors.deepOrangeAccent,
                             textColor: Colors.white,
+                            onTap: ()=> {
+                              // open dialog with user resume
+                              resumeDialog()
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: TextBtn(
+                            height: 35,
+                            //width: 100,
+                            title: "Whitepaper",
+                            btnColor: Colors.grey[200],
+                            textColor: Colors.deepOrangeAccent,
                             onTap: ()=> {
                               html.window.open("https://nft-breed.gitbook.io/whitepaper/", '_blank'),
                             },
@@ -560,7 +665,7 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
                 ),
               ),
               SizedBox(height: 30,),
-              Text("Select or enter your investissement value \n 0.1 min", style: TextStyle(color: Colors.black, fontSize: 17),),
+              Text("Select or enter your investissement value 0.1 min", style: TextStyle(color: Colors.black, fontSize: 17),),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
