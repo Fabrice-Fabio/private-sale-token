@@ -76,4 +76,3 @@ class TestnetAbis {
   ''';
   final ethDecimal = 18;
 }
-

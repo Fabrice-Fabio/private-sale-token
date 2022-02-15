@@ -15,7 +15,7 @@ import 'package:privatesale/smart_contracts/usdc_contract.dart';
 import 'package:privatesale/smart_contracts/usdt_contract.dart';
 import 'package:privatesale/wallet/walletprovider.dart';
 import 'package:privatesale/widgets/centered_view/centered_view.dart';
-import 'package:privatesale/widgets/navigation_bar/navigation_bar.dart';
+import 'package:privatesale/widgets/navigation_bar/nav_bar.dart';
 import 'package:privatesale/widgets/utils/export_utils.dart';
 import 'package:provider/provider.dart';
 import 'dart:html' as html;
@@ -552,7 +552,7 @@ class _HomeDesktopPageState extends State<HomeDesktopPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              NavigationBar(),
+              NavBar(),
               Text("✨ WELCOME TO PRIVATESALE ✨ ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40),),
               SizedBox(
                 child: TextLiquidFill(

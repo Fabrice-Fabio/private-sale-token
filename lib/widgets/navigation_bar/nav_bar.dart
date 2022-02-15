@@ -5,14 +5,14 @@ import 'package:privatesale/widgets/connect_wallet/connect_wallet.dart';
 import 'package:provider/provider.dart';
 import 'dart:js' as js;
 
-class NavigationBar extends StatefulWidget {
-  const NavigationBar({Key? key}) : super(key: key);
+class NavBar extends StatefulWidget {
+  const NavBar({Key? key}) : super(key: key);
 
   @override
-  State<NavigationBar> createState() => _NavigationBarState();
+  State<NavBar> createState() => _NavBarState();
 }
 
-class _NavigationBarState extends State<NavigationBar> {
+class _NavBarState extends State<NavBar> {
 
   @override
   Widget build(BuildContext context) {

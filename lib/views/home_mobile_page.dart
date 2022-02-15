@@ -10,7 +10,7 @@ import 'package:privatesale/smart_contracts/eth_contract.dart';
 import 'package:privatesale/smart_contracts/smart_contracts_index.dart';
 import 'package:privatesale/wallet/walletprovider.dart';
 import 'package:privatesale/widgets/centered_view/centered_view.dart';
-import 'package:privatesale/widgets/navigation_bar/navigation_bar.dart';
+import 'package:privatesale/widgets/navigation_bar/nav_bar.dart';
 import 'package:privatesale/widgets/utils/export_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_web3/ethers.dart' as eth;
@@ -809,7 +809,7 @@ class _HomeMobilePageState extends State<HomeMobilePage> {
         ),
       ),
       // TODO : uncomment to active drawer
-      drawer: NavigationBar(),
+      drawer: NavBar(),
     );
   }
 }
